@@ -2,26 +2,20 @@
   "status": "success",
   "diagnostics": [],
   "artifacts": {
-    "tokens": "build/fact/tokens.txt",
-    "ast_dot": "build/fact/ast.dot",
-    "ir": "build/fact/ir.txt",
-    "cfg_dot": "build/fact/cfg.dot",
-    "complexity_report": "build/fact/complexity_report.json",
     "opt_report": "build/fact/optimization_report.json",
-    "ir_opt": "build/fact/ir_optimized.txt",
     "llvm": "build/fact/out.ll",
     "exe": "build/fact/a.out",
     "run_output": "build/fact/run_output.txt"
   },
   "timings": {
-    "lex": 0.04,
-    "parse": 0.05,
-    "sema": 0.05,
-    "ir_gen": 0.07,
-    "opt": 0.07,
-    "llvm": 0.11,
-    "clang": 260.68,
-    "run": 493.42
+    "lex": 0.05,
+    "parse": 0.06,
+    "sema": 0.02,
+    "ir_gen": 0.04,
+    "opt": 0.02,
+    "llvm": 0.04,
+    "clang": 378.48,
+    "run": 519.24
   },
-  "timestamp": 1771359124.928318
+  "timestamp": 1771359276.001664
 }

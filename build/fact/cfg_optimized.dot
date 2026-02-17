@@ -1,7 +1,0 @@
-digraph CFG {
-  node [shape=box, fontname="Courier"];
-  subgraph cluster_main {
-    label = "Func main";
-    main_start [label=<<b>start:</b><br align='left'/>CONST    t1     = #3 <br align='left'/>COPY     a      = t1 <br align='left'/>CONST    t2     = #5 <br align='left'/>COPY     b      = t2 <br align='left'/>CONST    t3     = #2 <br align='left'/>COPY     c      = t3 <br align='left'/>ADD      t4     = a b <br align='left'/>DIV      t5     = t4 c <br align='left'/>CONST    t6     = #3 <br align='left'/>CONST    t7     = #2 <br align='left'/>MUL      t8     = t6 t7 <br align='left'/>ADD      t9     = t5 t8 <br align='left'/>CONST    t10    = #1 <br align='left'/>SUB      t11    = t9 t10 <br align='left'/>CALL     t12    = #print args:(t11)<br align='left'/>CONST    t13    = #0 <br align='left'/>RET     t13 >];
-  }
-}
