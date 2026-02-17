@@ -4,22 +4,24 @@
   "artifacts": {
     "tokens": "build/gcd/tokens.txt",
     "ast_dot": "build/gcd/ast.dot",
-    "ast_png": "build/gcd/ast.png",
     "ir": "build/gcd/ir.txt",
     "cfg_dot": "build/gcd/cfg.dot",
-    "cfg_png": "build/gcd/cfg.png",
+    "complexity_report": "build/gcd/complexity_report.json",
+    "opt_report": "build/gcd/optimization_report.json",
+    "ir_opt": "build/gcd/ir_optimized.txt",
     "llvm": "build/gcd/out.ll",
     "exe": "build/gcd/a.out",
     "run_output": "build/gcd/run_output.txt"
   },
   "timings": {
     "lex": 0.04,
-    "parse": 0.04,
-    "sema": 0.04,
+    "parse": 0.05,
+    "sema": 0.07,
     "ir_gen": 0.07,
+    "opt": 0.08,
     "llvm": 0.09,
-    "clang": 270.44,
-    "run": 539.58
+    "clang": 496.11,
+    "run": 504.15
   },
-  "timestamp": 1771358008.434907
+  "timestamp": 1771358488.457205
 }

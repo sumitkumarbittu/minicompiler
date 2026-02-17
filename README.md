@@ -1,126 +1,98 @@
-# MiniPython Compiler (minipycc) CLI Guide
+# MiniPython Compiler (minipycc)
 
-This guide details how to use the `minipycc` command-line interface to compile, debug, and visualize MiniPython programs.
+A production-grade, transparent compiler for a Python subset, targeting LLVM IR.
+This project emphasizes internal visibility, static analysis, and optimization visualization.
+
+## 🚀 Features
+
+### Core Capabilities
+- **Strict MiniPython v1**: Integers (`int64`), function calls, flow control (`if`/`while`).
+- **Production Pipeline**: `Lex -> Parse -> Semantic -> IR -> Opt -> Codegen`.
+- **LLVM Backend**: Generates optimized native binaries via Clang.
+
+### 🔬 Advanced Analysis & Visualization
+The compiler allows you to inspect every stage of compilation:
+- **Visual Artifacts**:
+  - `ast.png`: Abstract Syntax Tree.
+  - `cfg.png`: Control Flow Graph (Pre/Post optimization).
+  - `domtree.png`: Dominator Tree for structural analysis.
+- **Metrics**:
+  - Cyclomatic Complexity calculation per function.
+  - Instruction counts and optimization reduction reports.
+- **Optimization**:
+  - Constant Folding (`3 + 5 -> 8`).
+  - Dead Code Elimination (DCE).
+  - Control Flow Simplification.
+
+---
 
 ## ⚡️ Quick Start
 
 **Prerequisites**:
 - Python 3.9+
-- Clang / LLVM (`brew install llvm` on macOS or `apt install clang llvm` on Linux)
-- Graphviz (`brew install graphviz` or `apt install graphviz`) for visualizations
+- Clang / LLVM
+- Graphviz (`dot` command)
 
 **1. Setup**
-Make the CLI executable:
 ```bash
 chmod +x minipycc
 ```
 
-**2. Compile & Run a Program**
-There are example programs in `testcases/valid/`.
+**2. Compile & Analyze**
+Compile `fact.py` with full analysis and visualization:
 ```bash
-./minipycc compile testcases/valid/fact.py --out build/fact --run
+./minipycc compile testcases/valid/fact.py \
+  --out build/fact \
+  --emit all \
+  --run
 ```
 
----
-
-## 🐍 Language Capabilities (v1)
-
-The compiler currently supports a strict subset of Python known as **MiniPython v1**.
-
-### ✅ Supported Features
-*   **Types**: 64-bit Integers (`int64`) only. No strings or floats.
-*   **Math Operations**: `+`, `-`, `*`, `/` (Integer division). Parentheses `()` for precedence.
-*   **Comparisons**: `==`, `!=`, `<`, `<=`, `>`, `>=`.
-*   **Control Flow**:
-    *   `if` / `else` blocks (nested allowed).
-    *   `while` loops.
-    *   Significant whitespace (indentation) is enforced.
-*   **Functions**:
-    *   `def name(arg1, arg2):` definitions.
-    *   `return value` statements.
-    *   Recursive function calls.
-*   **Built-ins**:
-    *   `print(value)`: Prints an integer to standard output.
-*   **Comments**: Lines starting with `#`.
-
-### ❌ Not Yet Implemented
-*   Floats (`3.14`) or Strings (`"hello"`).
-*   Lists, Dictionaries, or Classes.
-*   Imports (standard library).
-*   Global variables (logic should be wrapped in functions or main script body).
-
-**Example Code:**
-```python
-def average(a, b):
-    sum = a + b
-    return sum / 2
-
-x = 10
-if x > 5:
-    print(average(x, 20)) # Output: 15
-```
+**3. Inspect Results**
+Check the `build/fact/` directory:
+- `result.json`: Build manifest and timings.
+- `cfg_optimized.png`: See how the graph changed.
+- `domtree_fact.png`: View the structure of the `fact` function.
+- `optimization_report.json`: See how many instructions were removed.
 
 ---
 
 ## 🛠 CLI Usage
 
-The general syntax is:
 ```bash
-./minipycc compile <SOURCE_FILE> --out <OUTPUT_DIR> [OPTIONS]
+./minipycc compile <SOURCE> --out <DIR> [FLAGS]
 ```
 
-### Options
-
-| Flag | Description | Used For |
-| :--- | :--- | :--- |
-| `--out <dir>` | **Required**. Directory to store output files. | Artifact organization |
-| `--emit <list>` | Comma-separated list of artifacts to generate. | specific outputs |
-| `--run` | Execute the compiled binary immediately. | Testing |
-| `--no-opt` | Disable optimizations (Default in v1). | Debugging |
-
-### `--emit` Options
-Control what the compiler generates. Default is `exe`.
-- **Intermediate**: `tokens`, `ast` (DOT), `ir`, `cfg` (DOT), `llvm`
-- **Visuals**: `png` (Renders AST and CFG DOT files to images)
-- **Binary**: `exe` (The final executable)
-
----
-
-## 📚 Examples
-
-### 1. Visual Debugging (AST & CFG)
-Generate PNG images of the syntax tree and control flow graph.
-```bash
-./minipycc compile testcases/valid/fib.py --out build/fib --emit ast,cfg,png
-```
-*View `build/fib/ast.png` and `build/fib/cfg.png` to see the compiler's internal representation.*
-
-### 2. Inspect LLVM IR
-See exactly what Low-Level Virtual Machine code generates.
-```bash
-./minipycc compile testcases/valid/cond.py --out build/cond --emit llvm
-cat build/cond/out.ll
-```
-
-### 3. Full Debug Pipeline
-Generate every possible artifact to understand the entire compilation process.
-```bash
-./minipycc compile testcases/valid/gcd.py --out build/gcd --emit tokens,ast,ir,cfg,llvm,exe,png --run
-```
+### Flags
+| Flag | Description |
+| :--- | :--- |
+| `--out <dir>` | Output directory (required). |
+| `--emit <list>` | Comma-separated: `tokens,ast,ir,cfg,opt,analysis,llvm,exe,png`. Use `all` for everything. |
+| `--run` | Execute the binary after build. |
+| `--no-opt` | Disable the optimization phase. |
+| `--analysis` | Force static analysis and complexity calculation. |
 
 ---
 
 ## 🐳 Docker Usage
 
-If you don't want to install LLVM/Graphviz locally, use Docker.
+Build a completely isolated environment:
 
-**1. Build Image**
 ```bash
+# Build
 docker build -t minipycc .
+
+# Run with volume mount
+docker run --rm -v "$PWD:/work" minipycc \
+  compile testcases/valid/fact.py \
+  --out build/docker_fact \
+  --emit all \
+  --run
 ```
 
-**2. Run Compiler**
-Mount your current directory to `/work` so artifacts appear on your host machine.
-```bash
-docker run --rm -v "$PWD:/work" minipycc compile testcases/valid/fact.py --out build/docker_fact --emit ast,llvm,png --run
-```
+## Architecture
+
+- `src/core/ast`: Tree definition and DOT generator.
+- `src/core/ir`: Triple-address code (TAC) representation.
+- `src/core/analysis`: Dominator trees, loop detection, complexity metrics.
+- `src/core/opt`: Transformation passes (ConstFold, DCE).
+- `src/core/codegen_llvm`: Translation to LLVM IR.

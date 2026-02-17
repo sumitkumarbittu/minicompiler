@@ -1,0 +1,13 @@
+Function main:
+  start:
+    CONST    t1     = #3 
+    COPY     a      = t1 
+    CONST    t2     = #5 
+    COPY     b      = t2 
+    CONST    t3     = #4 
+    COPY     c      = t3 
+    ADD      t4     = a b 
+    DIV      t5     = t4 c 
+    CALL     t6     = #print args:(t5)
+    CONST    t7     = #0 
+    RET     t7 

@@ -8,15 +8,21 @@ declare i32 @print_bool(i1)
 
 define i64 @main() {
 entry:
-  %t2.addr = alloca i64
-  %t1.addr = alloca i64
-  %t6.addr = alloca i64
-  %t3.addr = alloca i64
-  %t4.addr = alloca i64
-  %c.addr = alloca i64
-  %t7.addr = alloca i64
   %t5.addr = alloca i64
+  %t8.addr = alloca i64
+  %t10.addr = alloca i64
+  %c.addr = alloca i64
+  %t3.addr = alloca i64
+  %t13.addr = alloca i64
+  %t2.addr = alloca i64
+  %t6.addr = alloca i64
+  %t11.addr = alloca i64
   %a.addr = alloca i64
+  %t4.addr = alloca i64
+  %t1.addr = alloca i64
+  %t7.addr = alloca i64
+  %t9.addr = alloca i64
+  %t12.addr = alloca i64
   %b.addr = alloca i64
   br label %start
 start:
@@ -37,9 +43,24 @@ start:
   %_8 = load i64, i64* %c.addr
   %_9 = sdiv i64 %_7, %_8
   store i64 %_9, i64* %t5.addr
-  %_10 = load i64, i64* %t5.addr
-  call i32 @print_int(i64 %_10)
-  store i64 0, i64* %t7.addr
+  store i64 3, i64* %t6.addr
+  store i64 2, i64* %t7.addr
+  %_10 = load i64, i64* %t6.addr
   %_11 = load i64, i64* %t7.addr
-  ret i64 %_11
+  %_12 = mul i64 %_10, %_11
+  store i64 %_12, i64* %t8.addr
+  %_13 = load i64, i64* %t5.addr
+  %_14 = load i64, i64* %t8.addr
+  %_15 = add i64 %_13, %_14
+  store i64 %_15, i64* %t9.addr
+  store i64 1, i64* %t10.addr
+  %_16 = load i64, i64* %t9.addr
+  %_17 = load i64, i64* %t10.addr
+  %_18 = sub i64 %_16, %_17
+  store i64 %_18, i64* %t11.addr
+  %_19 = load i64, i64* %t11.addr
+  call i32 @print_int(i64 %_19)
+  store i64 0, i64* %t13.addr
+  %_20 = load i64, i64* %t13.addr
+  ret i64 %_20
 }

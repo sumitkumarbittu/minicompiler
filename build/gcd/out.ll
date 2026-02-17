@@ -9,15 +9,15 @@ declare i32 @print_bool(i1)
 define i64 @main() {
 entry:
   %b.addr = alloca i64
-  %t3.addr = alloca i64
-  %t2.addr = alloca i64
-  %t7.addr = alloca i64
-  %t4.addr = alloca i64
   %t5.addr = alloca i64
-  %a.addr = alloca i64
-  %c.addr = alloca i64
   %t6.addr = alloca i64
+  %t7.addr = alloca i64
+  %c.addr = alloca i64
   %t1.addr = alloca i64
+  %a.addr = alloca i64
+  %t2.addr = alloca i64
+  %t3.addr = alloca i64
+  %t4.addr = alloca i64
   br label %start
 start:
   store i64 3, i64* %t1.addr
