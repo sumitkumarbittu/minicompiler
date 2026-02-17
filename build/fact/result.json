@@ -1,0 +1,19 @@
+{
+  "status": "success",
+  "diagnostics": [],
+  "artifacts": {
+    "llvm": "build/fact/out.ll",
+    "exe": "build/fact/a.out",
+    "run_output": "build/fact/run_output.txt"
+  },
+  "timings": {
+    "lex": 0.04,
+    "parse": 0.04,
+    "sema": 0.01,
+    "ir_gen": 0.03,
+    "llvm": 0.03,
+    "clang": 493.72,
+    "run": 541.71
+  },
+  "timestamp": 1771357831.694252
+}

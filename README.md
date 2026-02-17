@@ -1,206 +1,126 @@
-# 🧠 Mini Programming Language Compiler with Visualization
+# MiniPython Compiler (minipycc) CLI Guide
 
-## 📌 Overview
+This guide details how to use the `minipycc` command-line interface to compile, debug, and visualize MiniPython programs.
 
-This project implements a production-grade compiler for a custom-designed programming language (MiniLang). It covers the entire compiler pipeline, from lexical analysis to optimized target code generation, with visualization of internal compiler phases.
+## ⚡️ Quick Start
 
-The project is fully aligned with standard Compiler Design syllabi (Aho–Ullman model) and demonstrates both theoretical concepts and practical implementation.
+**Prerequisites**:
+- Python 3.9+
+- Clang / LLVM (`brew install llvm` on macOS or `apt install clang llvm` on Linux)
+- Graphviz (`brew install graphviz` or `apt install graphviz`) for visualizations
 
-## 🎯 Objectives
-
-- Design and implement a complete compiler for a high-level programming language
-- Apply compiler design concepts such as parsing, semantic analysis, and optimization
-- Generate intermediate and target code
-- Visualize compiler internals for better understanding and debugging
-- Build a modular, extensible, and testable compiler architecture
-
-## 🧩 Language Features (MiniLang)
-
-### 🔹 Data Types
-
-- `int`
-- `float`
-- `bool`
-
-### 🔹 Supported Constructs
-
-- Variable declarations and assignments
-- Arithmetic expressions (`+ - * /`)
-- Boolean expressions and relational operators
-- Conditional statements (`if–else`)
-- Iteration (`while`)
-- Selection (`switch–case`)
-- Functions and procedure calls
-- Nested scopes
-
-## 🏗️ Compiler Architecture
-
-```
-Source Code
-   ↓
-Lexical Analysis
-   ↓
-Syntax Analysis
-   ↓
-Semantic Analysis
-   ↓
-Intermediate Code Generation
-   ↓
-Code Optimization
-   ↓
-Target Code Generation
-```
-
-Each phase is implemented as an independent module, enabling maintainability and scalability.
-
-## 📚 Syllabus Coverage Mapping
-
-### ✅ Unit 1 – Lexical Analysis
-
-- Token specification using regular expressions
-- Input buffering and token recognition
-- Error handling for invalid lexemes
-- **Tool Used:** Flex (Lex)
-
-### ✅ Unit 2 – Syntax Analysis
-
-- Context-Free Grammar (CFG)
-- LALR parsing
-- Operator precedence and associativity
-- Ambiguous grammar resolution
-- **Tool Used:** Bison (Yacc)
-
-### ✅ Unit 3 – Syntax-Directed Translation & Runtime Environment
-
-- Syntax-directed definitions
-- Semantic rules and type checking
-- Symbol table with scope management
-- Storage allocation strategies
-- Parameter passing mechanisms
-- Stack-based runtime model
-
-### ✅ Unit 4 – Intermediate Code Generation
-
-- Three Address Code (TAC)
-- Quadruples / Triples
-- Boolean expressions
-- Backpatching
-- Control flow handling
-- Basic blocks and flow graphs
-- DAG representation of expressions
-
-### ✅ Unit 5 – Code Optimization & Compiler Development
-
-- Constant folding
-- Dead code elimination
-- Loop optimization
-- Peephole optimization
-- Modular compiler design
-- Testing and maintenance strategy
-- Robust error handling
-
-## 📊 Visualization Features
-
-Visualization is integrated to expose internal compiler behavior:
-
-| Phase | Visualization |
-|-------|---------------|
-| Lexical Analysis | Token table |
-| Syntax Analysis | Parse Tree / AST |
-| Semantic Analysis | Symbol Table (scope-wise) |
-| Intermediate Code | Three Address Code |
-| Control Flow | Control Flow Graph (CFG) |
-| Optimization | DAG & optimized TAC |
-
-**Tool Used:** Graphviz (.dot → .png)
-
-## 📁 Project Structure
-
-```
-MiniLang-Compiler/
-│
-├── lexer/
-│   └── lexer.l
-├── parser/
-│   └── parser.y
-├── semantic/
-│   ├── symbol_table.c
-│   └── type_checker.c
-├── intermediate/
-│   └── tac_generator.c
-├── optimizer/
-│   └── optimizer.c
-├── visualization/
-│   ├── ast.dot
-│   ├── cfg.dot
-│   ├── dag.dot
-│   └── token_table.txt
-├── codegen/
-│   └── target_code.c
-├── testcases/
-├── build/
-└── README.md
-```
-
-## 🛠️ Technologies Used
-
-- **Language:** C / C++
-- **Lexer Generator:** Flex
-- **Parser Generator:** Bison
-- **Visualization:** Graphviz
-- **Build Tools:** GCC, Make
-- **Platform:** Linux / macOS
-
-## ▶️ How to Build & Run
-
-### 1️⃣ Install Dependencies
-
+**1. Setup**
+Make the CLI executable:
 ```bash
-sudo apt install flex bison graphviz gcc
+chmod +x minipycc
 ```
 
-### 2️⃣ Build the Compiler
-
+**2. Compile & Run a Program**
+There are example programs in `testcases/valid/`.
 ```bash
-flex lexer/lexer.l
-bison -d parser/parser.y
-gcc lex.yy.c parser.tab.c semantic/*.c intermediate/*.c optimizer/*.c codegen/*.c -o compiler
+./minipycc compile testcases/valid/fact.py --out build/fact --run
 ```
 
-### 3️⃣ Run the Compiler
+---
 
+## 🐍 Language Capabilities (v1)
+
+The compiler currently supports a strict subset of Python known as **MiniPython v1**.
+
+### ✅ Supported Features
+*   **Types**: 64-bit Integers (`int64`) only. No strings or floats.
+*   **Math Operations**: `+`, `-`, `*`, `/` (Integer division). Parentheses `()` for precedence.
+*   **Comparisons**: `==`, `!=`, `<`, `<=`, `>`, `>=`.
+*   **Control Flow**:
+    *   `if` / `else` blocks (nested allowed).
+    *   `while` loops.
+    *   Significant whitespace (indentation) is enforced.
+*   **Functions**:
+    *   `def name(arg1, arg2):` definitions.
+    *   `return value` statements.
+    *   Recursive function calls.
+*   **Built-ins**:
+    *   `print(value)`: Prints an integer to standard output.
+*   **Comments**: Lines starting with `#`.
+
+### ❌ Not Yet Implemented
+*   Floats (`3.14`) or Strings (`"hello"`).
+*   Lists, Dictionaries, or Classes.
+*   Imports (standard library).
+*   Global variables (logic should be wrapped in functions or main script body).
+
+**Example Code:**
+```python
+def average(a, b):
+    sum = a + b
+    return sum / 2
+
+x = 10
+if x > 5:
+    print(average(x, 20)) # Output: 15
+```
+
+---
+
+## 🛠 CLI Usage
+
+The general syntax is:
 ```bash
-./compiler testcases/sample.min
+./minipycc compile <SOURCE_FILE> --out <OUTPUT_DIR> [OPTIONS]
 ```
 
-### 4️⃣ Generate Visualizations
+### Options
 
+| Flag | Description | Used For |
+| :--- | :--- | :--- |
+| `--out <dir>` | **Required**. Directory to store output files. | Artifact organization |
+| `--emit <list>` | Comma-separated list of artifacts to generate. | specific outputs |
+| `--run` | Execute the compiled binary immediately. | Testing |
+| `--no-opt` | Disable optimizations (Default in v1). | Debugging |
+
+### `--emit` Options
+Control what the compiler generates. Default is `exe`.
+- **Intermediate**: `tokens`, `ast` (DOT), `ir`, `cfg` (DOT), `llvm`
+- **Visuals**: `png` (Renders AST and CFG DOT files to images)
+- **Binary**: `exe` (The final executable)
+
+---
+
+## 📚 Examples
+
+### 1. Visual Debugging (AST & CFG)
+Generate PNG images of the syntax tree and control flow graph.
 ```bash
-dot -Tpng visualization/ast.dot -o ast.png
-dot -Tpng visualization/cfg.dot -o cfg.png
-dot -Tpng visualization/dag.dot -o dag.png
+./minipycc compile testcases/valid/fib.py --out build/fib --emit ast,cfg,png
+```
+*View `build/fib/ast.png` and `build/fib/cfg.png` to see the compiler's internal representation.*
+
+### 2. Inspect LLVM IR
+See exactly what Low-Level Virtual Machine code generates.
+```bash
+./minipycc compile testcases/valid/cond.py --out build/cond --emit llvm
+cat build/cond/out.ll
 ```
 
-## 🧪 Testing Strategy
+### 3. Full Debug Pipeline
+Generate every possible artifact to understand the entire compilation process.
+```bash
+./minipycc compile testcases/valid/gcd.py --out build/gcd --emit tokens,ast,ir,cfg,llvm,exe,png --run
+```
 
-- Valid and invalid syntax test cases
-- Type mismatch test cases
-- Nested scope tests
-- Optimization correctness validation
-- Control flow edge cases
+---
 
-## 📈 Future Enhancements
+## 🐳 Docker Usage
 
-- Register allocation using graph coloring
-- SSA (Static Single Assignment) form
-- JIT compilation
-- GUI-based visualization
-- Support for arrays and pointers
+If you don't want to install LLVM/Graphviz locally, use Docker.
 
-## 💬 Viva-Ready Project Description
+**1. Build Image**
+```bash
+docker build -t minipycc .
+```
 
-"This project implements a complete compiler pipeline for a custom programming language, covering lexical analysis, syntax analysis, semantic analysis, intermediate code generation, optimization, and target code generation. The compiler also includes visualization of internal representations such as parse trees, control flow graphs, and DAGs to enhance understanding and debugging."
-
-## 📜 License
-
-This project is intended for academic and educational use.
+**2. Run Compiler**
+Mount your current directory to `/work` so artifacts appear on your host machine.
+```bash
+docker run --rm -v "$PWD:/work" minipycc compile testcases/valid/fact.py --out build/docker_fact --emit ast,llvm,png --run
+```

@@ -1,0 +1,15 @@
+digraph CFG {
+  node [shape=box, fontname="Courier"];
+  subgraph cluster_fact {
+    label = "Func fact";
+    fact_start [label=<<b>start:</b><br align='left'/>CONST    t1     = #1 <br align='left'/>ICMP_LTE t2     = n t1 <br align='left'/>BR      t2 args:(then_1, if_cont_3)>];
+    fact_then_1 [label=<<b>then_1:</b><br align='left'/>CONST    t3     = #1 <br align='left'/>RET     t3 >];
+    fact_if_cont_3 [label=<<b>if_cont_3:</b><br align='left'/>CONST    t4     = #1 <br align='left'/>SUB      t5     = n t4 <br align='left'/>CALL     t6     = #fact args:(t5)<br align='left'/>MUL      t7     = n t6 <br align='left'/>RET     t7 >];
+    fact_start -> fact_then_1 [label="T"];
+    fact_start -> fact_if_cont_3 [label="F"];
+  }
+  subgraph cluster_main {
+    label = "Func main";
+    main_start [label=<<b>start:</b><br align='left'/>CONST    t8     = #5 <br align='left'/>CALL     t9     = #fact args:(t8)<br align='left'/>CALL     t10    = #print args:(t9)<br align='left'/>CONST    t11    = #10 <br align='left'/>CALL     t12    = #fact args:(t11)<br align='left'/>CALL     t13    = #print args:(t12)<br align='left'/>CONST    t14    = #0 <br align='left'/>RET     t14 >];
+  }
+}

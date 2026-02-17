@@ -1,0 +1,18 @@
+{
+  "status": "success",
+  "diagnostics": [],
+  "artifacts": {
+    "tokens": "testcases/golden/fib/tokens.txt",
+    "ast_dot": "testcases/golden/fib/ast.dot",
+    "ir": "testcases/golden/fib/ir.txt",
+    "llvm": "testcases/golden/fib/out.ll"
+  },
+  "timings": {
+    "lex": 0.13,
+    "parse": 0.13,
+    "sema": 0.03,
+    "ir_gen": 0.09,
+    "llvm": 0.05
+  },
+  "timestamp": 1771355310.35502
+}

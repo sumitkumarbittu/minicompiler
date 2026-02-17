@@ -1,0 +1,25 @@
+{
+  "status": "success",
+  "diagnostics": [],
+  "artifacts": {
+    "tokens": "build/tests/fact/tokens.txt",
+    "ast_dot": "build/tests/fact/ast.dot",
+    "ast_png": "build/tests/fact/ast.png",
+    "ir": "build/tests/fact/ir.txt",
+    "cfg_dot": "build/tests/fact/cfg.dot",
+    "cfg_png": "build/tests/fact/cfg.png",
+    "llvm": "build/tests/fact/out.ll",
+    "exe": "build/tests/fact/a.out",
+    "run_output": "build/tests/fact/run_output.txt"
+  },
+  "timings": {
+    "lex": 0.11,
+    "parse": 0.11,
+    "sema": 0.22,
+    "ir_gen": 0.27,
+    "llvm": 0.15,
+    "clang": 433.83,
+    "run": 554.84
+  },
+  "timestamp": 1771355295.99562
+}

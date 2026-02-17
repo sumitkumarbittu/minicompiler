@@ -1,0 +1,19 @@
+{
+  "status": "success",
+  "diagnostics": [],
+  "artifacts": {
+    "llvm": "build/tests/fib/out.ll",
+    "exe": "build/tests/fib/a.out",
+    "run_output": "build/tests/fib/run_output.txt"
+  },
+  "timings": {
+    "lex": 0.13,
+    "parse": 0.13,
+    "sema": 0.02,
+    "ir_gen": 0.1,
+    "llvm": 0.05,
+    "clang": 52.53,
+    "run": 371.95
+  },
+  "timestamp": 1771355296.4933481
+}

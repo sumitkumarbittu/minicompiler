@@ -1,0 +1,30 @@
+Function fib:
+  start:
+    CONST    t1     = #0 
+    COPY     a      = t1 
+    CONST    t2     = #1 
+    COPY     b      = t2 
+    CONST    t3     = #0 
+    COPY     i      = t3 
+    JMP     while_cond_1 
+  while_cond_1:
+    ICMP_LT  t4     = i n 
+    BR      t4 args:(while_body_2, while_exit_3)
+  while_body_2:
+    ADD      t5     = a b 
+    COPY     temp   = t5 
+    COPY     a      = b 
+    COPY     b      = temp 
+    CONST    t6     = #1 
+    ADD      t7     = i t6 
+    COPY     i      = t7 
+    JMP     while_cond_1 
+  while_exit_3:
+    RET     a 
+Function main:
+  start:
+    CONST    t8     = #10 
+    CALL     t9     = #fib args:(t8)
+    CALL     t10    = #print args:(t9)
+    CONST    t11    = #0 
+    RET     t11 
