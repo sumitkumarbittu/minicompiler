@@ -1,0 +1,27 @@
+{
+  "status": "success",
+  "diagnostics": [],
+  "artifacts": {
+    "tokens": "build/aviral/tokens.txt",
+    "ast_dot": "build/aviral/ast.dot",
+    "ir": "build/aviral/ir.txt",
+    "cfg_dot": "build/aviral/cfg.dot",
+    "complexity_report": "build/aviral/complexity_report.json",
+    "opt_report": "build/aviral/optimization_report.json",
+    "ir_opt": "build/aviral/ir_optimized.txt",
+    "llvm": "build/aviral/out.ll",
+    "exe": "build/aviral/a.out",
+    "run_output": "build/aviral/run_output.txt"
+  },
+  "timings": {
+    "lex": 0.02,
+    "parse": 0.03,
+    "sema": 0.06,
+    "ir_gen": 0.06,
+    "opt": 0.07,
+    "llvm": 0.1,
+    "clang": 369.41,
+    "run": 767.01
+  },
+  "timestamp": 1774279169.7265
+}

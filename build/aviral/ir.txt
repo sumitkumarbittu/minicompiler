@@ -1,0 +1,8 @@
+Function main:
+  start:
+    CONST    t1     = #3 
+    CONST    t2     = #5 
+    ADD      t3     = t1 t2 
+    CALL     t4     = #print args:(t3)
+    CONST    t5     = #0 
+    RET     t5 

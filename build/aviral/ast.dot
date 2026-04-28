@@ -1,0 +1,16 @@
+digraph AST {
+  node [shape=box, fontname="Courier"];
+  n1 [label="Module"];
+  n2 [label="Def main()"];
+  n3 [label="ExprStmt"];
+  n4 [label="Call print"];
+  n5 [label="Op +"];
+  n6 [label="Num 3"];
+  n5 -> n6;
+  n7 [label="Num 5"];
+  n5 -> n7;
+  n4 -> n5;
+  n3 -> n4;
+  n2 -> n3;
+  n1 -> n2;
+}

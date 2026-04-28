@@ -14,14 +14,14 @@
     "run_output": "build/gcd/run_output.txt"
   },
   "timings": {
-    "lex": 0.04,
-    "parse": 0.05,
-    "sema": 0.07,
+    "lex": 0.03,
+    "parse": 0.04,
+    "sema": 0.06,
     "ir_gen": 0.07,
-    "opt": 0.08,
-    "llvm": 0.09,
-    "clang": 496.11,
-    "run": 504.15
+    "opt": 0.07,
+    "llvm": 0.1,
+    "clang": 411.6,
+    "run": 601.95
   },
-  "timestamp": 1771358488.457205
+  "timestamp": 1774278932.938635
 }

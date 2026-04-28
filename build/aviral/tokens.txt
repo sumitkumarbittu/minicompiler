@@ -1,0 +1,9 @@
+Token(PRINT, 'print', 1:-4)
+Token(LPAREN, '(', 1:6)
+Token(INTEGER, '3', 1:6)
+Token(PLUS, '+', 1:8)
+Token(INTEGER, '5', 1:8)
+Token(RPAREN, ')', 1:10)
+Token(NEWLINE, '
+', 1:11)
+Token(EOF, '', 1:11)

@@ -1,0 +1,27 @@
+{
+  "status": "success",
+  "diagnostics": [],
+  "artifacts": {
+    "tokens": "build/docker_fact/tokens.txt",
+    "ast_dot": "build/docker_fact/ast.dot",
+    "ir": "build/docker_fact/ir.txt",
+    "cfg_dot": "build/docker_fact/cfg.dot",
+    "complexity_report": "build/docker_fact/complexity_report.json",
+    "opt_report": "build/docker_fact/optimization_report.json",
+    "ir_opt": "build/docker_fact/ir_optimized.txt",
+    "llvm": "build/docker_fact/out.ll",
+    "exe": "build/docker_fact/a.out",
+    "run_output": "build/docker_fact/run_output.txt"
+  },
+  "timings": {
+    "lex": 1.43,
+    "parse": 0.7,
+    "sema": 20.84,
+    "ir_gen": 1.85,
+    "opt": 1.6,
+    "llvm": 0.35,
+    "clang": 2548.7,
+    "run": 11.01
+  },
+  "timestamp": 1777418079.3380063
+}

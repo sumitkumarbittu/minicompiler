@@ -8,22 +8,22 @@ declare i32 @print_bool(i1)
 
 define i64 @main() {
 entry:
-  %d.addr = alloca i64
-  %t5.addr = alloca i64
-  %a.addr = alloca i64
-  %t9.addr = alloca i64
-  %t2.addr = alloca i64
-  %t6.addr = alloca i64
-  %t7.addr = alloca i64
-  %t10.addr = alloca i64
-  %t3.addr = alloca i64
-  %t1.addr = alloca i64
-  %t4.addr = alloca i64
-  %t11.addr = alloca i64
-  %b.addr = alloca i64
   %e.addr = alloca i64
-  %t8.addr = alloca i64
+  %t4.addr = alloca i64
+  %t7.addr = alloca i64
+  %b.addr = alloca i64
+  %t9.addr = alloca i64
+  %t6.addr = alloca i64
+  %t3.addr = alloca i64
+  %d.addr = alloca i64
   %c.addr = alloca i64
+  %t5.addr = alloca i64
+  %t2.addr = alloca i64
+  %t10.addr = alloca i64
+  %a.addr = alloca i64
+  %t8.addr = alloca i64
+  %t11.addr = alloca i64
+  %t1.addr = alloca i64
   br label %start
 start:
   store i64 3, i64* %t1.addr
@@ -38,7 +38,7 @@ start:
   store i64 45, i64* %t4.addr
   %_4 = load i64, i64* %t4.addr
   store i64 %_4, i64* %d.addr
-  store i64 28, i64* %t5.addr
+  store i64 28232, i64* %t5.addr
   %_5 = load i64, i64* %t5.addr
   store i64 %_5, i64* %e.addr
   %_6 = load i64, i64* %a.addr
