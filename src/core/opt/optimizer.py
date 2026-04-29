@@ -102,7 +102,7 @@ class Optimizer:
             
             # Remove definitions of unused variables (unless side effect like CALL)
             # CALL and JMP/BR/RET have side effects or control flow logic so keep them
-            side_effect_ops = [OpCode.CALL, OpCode.JMP, OpCode.BR, OpCode.RET, OpCode.PARAM, OpCode.LABEL]
+            side_effect_ops = [OpCode.CALL, OpCode.JMP, OpCode.BR, OpCode.RET, OpCode.PARAM, OpCode.LABEL, OpCode.LIST_SET]
             
             for bb in f.blocks:
                 new_instrs = []

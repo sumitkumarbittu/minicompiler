@@ -1,0 +1,21 @@
+{
+  "status": "success",
+  "diagnostics": [],
+  "artifacts": {
+    "opt_report": "build/v2_v3/optimization_report.json",
+    "llvm": "build/v2_v3/out.ll",
+    "exe": "build/v2_v3/a.out",
+    "run_output": "build/v2_v3/run_output.txt"
+  },
+  "timings": {
+    "lex": 0.15,
+    "parse": 0.25,
+    "sema": 0.06,
+    "ir_gen": 0.14,
+    "opt": 0.09,
+    "llvm": 0.16,
+    "clang": 438.95,
+    "run": 229.77
+  },
+  "timestamp": 1777438952.153156
+}

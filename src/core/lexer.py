@@ -17,11 +17,25 @@ class TokenType(Enum):
     ELSE = auto()
     WHILE = auto()
     RETURN = auto()
+    FOR = auto()
+    IN = auto()
+    RANGE = auto()
+    BREAK = auto()
+    CONTINUE = auto()
+    PASS = auto()
+    TRUE = auto()
+    FALSE = auto()
+    AND = auto()
+    OR = auto()
+    NOT = auto()
     
     # Builtins/Identifiers/Literals
     IDENTIFIER = auto()
     INTEGER = auto()
+    FLOAT = auto()
+    STRING = auto()
     PRINT = auto()
+    LEN = auto()
     
     # Operators
     PLUS = auto()
@@ -41,6 +55,9 @@ class TokenType(Enum):
     RPAREN = auto()
     COLON = auto()
     COMMA = auto()
+    LBRACKET = auto()
+    RBRACKET = auto()
+    DOT = auto()
 
 @dataclass
 class Token:
@@ -71,7 +88,19 @@ class Lexer:
             'else': TokenType.ELSE,
             'while': TokenType.WHILE,
             'return': TokenType.RETURN,
-            'print': TokenType.PRINT # Treated as keyword-ish for v1
+            'for': TokenType.FOR,
+            'in': TokenType.IN,
+            'range': TokenType.RANGE,
+            'break': TokenType.BREAK,
+            'continue': TokenType.CONTINUE,
+            'pass': TokenType.PASS,
+            'True': TokenType.TRUE,
+            'False': TokenType.FALSE,
+            'and': TokenType.AND,
+            'or': TokenType.OR,
+            'not': TokenType.NOT,
+            'print': TokenType.PRINT,
+            'len': TokenType.LEN,
         }
 
     def tokenize(self) -> list[Token]:
@@ -165,6 +194,10 @@ class Lexer:
             if ch.isdigit():
                 self._lex_number()
                 continue
+
+            if ch == '"':
+                self._lex_string()
+                continue
                 
             # Operators
             if self._match("=="): self._add(TokenType.EQEQ, "=="); continue
@@ -183,6 +216,9 @@ class Lexer:
             elif ch == ')': self._add(TokenType.RPAREN, ")")
             elif ch == ':': self._add(TokenType.COLON, ":")
             elif ch == ',': self._add(TokenType.COMMA, ",")
+            elif ch == '[': self._add(TokenType.LBRACKET, "[")
+            elif ch == ']': self._add(TokenType.RBRACKET, "]")
+            elif ch == '.': self._add(TokenType.DOT, ".")
             else:
                 self._error(f"Unexpected character '{ch}'")
                 self.pos += 1
@@ -215,21 +251,59 @@ class Lexer:
 
     def _lex_identifier(self):
         start = self.pos
+        start_col = self.col
         while self.pos < len(self.source) and (self.source[self.pos].isalnum() or self.source[self.pos] == '_'):
             self.pos += 1
         text = self.source[start:self.pos]
         
         token_type = self.keywords.get(text, TokenType.IDENTIFIER)
-        self.tokens.append(Token(token_type, text, self.line, self.col - (self.pos - start)))
+        self.tokens.append(Token(token_type, text, self.line, start_col))
         self.col += (self.pos - start)
 
     def _lex_number(self):
         start = self.pos
+        start_col = self.col
         while self.pos < len(self.source) and self.source[self.pos].isdigit():
             self.pos += 1
+        is_float = False
+        if self.pos < len(self.source) and self.source[self.pos] == '.':
+            next_pos = self.pos + 1
+            if next_pos < len(self.source) and self.source[next_pos].isdigit():
+                is_float = True
+                self.pos += 1
+                while self.pos < len(self.source) and self.source[self.pos].isdigit():
+                    self.pos += 1
         text = self.source[start:self.pos]
-        self.tokens.append(Token(TokenType.INTEGER, text, self.line, self.col - (self.pos - start)))
+        typ = TokenType.FLOAT if is_float else TokenType.INTEGER
+        self.tokens.append(Token(typ, text, self.line, start_col))
         self.col += (self.pos - start)
+
+    def _lex_string(self):
+        start_col = self.col
+        self.pos += 1
+        self.col += 1
+        chars = []
+        while self.pos < len(self.source) and self.source[self.pos] != '"':
+            ch = self.source[self.pos]
+            if ch == '\n':
+                self._error("Unterminated string literal")
+                break
+            if ch == '\\':
+                self.pos += 1
+                self.col += 1
+                if self.pos >= len(self.source):
+                    break
+                esc = self.source[self.pos]
+                escapes = {'n': '\n', 't': '\t', '"': '"', '\\': '\\'}
+                chars.append(escapes.get(esc, esc))
+            else:
+                chars.append(ch)
+            self.pos += 1
+            self.col += 1
+        if self.pos < len(self.source) and self.source[self.pos] == '"':
+            self.pos += 1
+            self.col += 1
+        self.tokens.append(Token(TokenType.STRING, "".join(chars), self.line, start_col))
 
     def _error(self, msg):
         self.diag.report(Diagnostic(Severity.ERROR, self.file_path, self.line, self.col, msg))

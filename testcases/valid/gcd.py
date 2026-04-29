@@ -1,4 +1,10 @@
-a = 3
-b = 5
-c=4
-print((a+b)/c)
+def factorial(n):
+    if n <= 1:
+        return 1
+    return n * factorial(n - 1)
+
+x = 5
+result = factorial(x)
+
+print("Factorial result:")
+print(result)

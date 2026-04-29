@@ -53,8 +53,6 @@ class DiagnosticsEngine:
 
     def report(self, diag: Diagnostic):
         self.diagnostics.append(diag)
-        # Immediate print for user feedback
-        print(f"{diag.severity.name}: {diag.file_path}:{diag.line}:{diag.col} {diag.message}")
 
     def has_errors(self) -> bool:
         return any(d.severity == Severity.ERROR for d in self.diagnostics)

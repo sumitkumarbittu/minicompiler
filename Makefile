@@ -24,13 +24,7 @@ build:
 	chmod +x minipycc
 
 test:
-	@echo "Running Tests..."
-	@mkdir -p $(OUT_DIR)/tests
-	@$(PYTHON) minipycc compile testcases/valid/fact.py --out $(OUT_DIR)/tests/fact --emit tokens,ast,ir,cfg,llvm,exe,png --run
-	@echo "[PASS] Factorial"
-	@$(PYTHON) minipycc compile testcases/valid/fib.py --out $(OUT_DIR)/tests/fib --emit llvm,exe,png --run
-	@echo "[PASS] Fibonacci"
-	@echo "Tests Completed."
+	@$(PYTHON) test_runner.py
 
 clean:
 	rm -rf $(OUT_DIR)

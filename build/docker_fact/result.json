@@ -14,14 +14,14 @@
     "run_output": "build/docker_fact/run_output.txt"
   },
   "timings": {
-    "lex": 1.43,
-    "parse": 0.7,
-    "sema": 20.84,
-    "ir_gen": 1.85,
-    "opt": 1.6,
-    "llvm": 0.35,
-    "clang": 2548.7,
-    "run": 11.01
+    "lex": 0.3,
+    "parse": 0.11,
+    "sema": 0.16,
+    "ir_gen": 0.14,
+    "opt": 0.08,
+    "llvm": 0.16,
+    "clang": 368.32,
+    "run": 1.85
   },
-  "timestamp": 1777418079.3380063
+  "timestamp": 1777449182.4499698
 }

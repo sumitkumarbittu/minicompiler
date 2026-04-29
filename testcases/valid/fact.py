@@ -1,7 +1,17 @@
-a = 3
-b = 5
-c = 2
-d = 45
-e = 28232
+n = 29
+isPrime = True
 
-print((a+b)/c + d - e)
+if n <= 1:
+    isPrime = False
+else:
+    i = 2
+
+    while i * i <= n:
+        if n / i * i == n:
+            isPrime = False
+            break
+
+        i = i + 1
+
+print("Is prime:")
+print(isPrime)

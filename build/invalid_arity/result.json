@@ -1,0 +1,20 @@
+{
+  "status": "fail",
+  "diagnostics": [
+    {
+      "severity": "error",
+      "file": "/Users/sumitkumar/Documents/GitHub/minicompiler/testcases/invalid/wrong_arity.py",
+      "line": 4,
+      "col": 7,
+      "message": "Function 'add' expects 2 arguments, got 1",
+      "snippet": ""
+    }
+  ],
+  "artifacts": {},
+  "timings": {
+    "lex": 0.05,
+    "parse": 0.05,
+    "sema": 0.03
+  },
+  "timestamp": 1777438967.297465
+}

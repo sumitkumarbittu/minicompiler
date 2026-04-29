@@ -1,0 +1,13 @@
+digraph DomTree_main {
+  node [shape=box];
+  "start" [style=bold];
+  "start" -> "for_cond_1";
+  "for_cond_1" -> "for_body_2";
+  "for_body_2" -> "then_5";
+  "for_body_2" -> "if_cont_7";
+  "for_body_2" -> "for_incr_3";
+  "for_cond_1" -> "for_exit_4";
+  "for_exit_4" -> "while_cond_8";
+  "while_cond_8" -> "while_body_9";
+  "while_cond_8" -> "while_exit_10";
+}

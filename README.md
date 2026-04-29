@@ -1,81 +1,157 @@
-# 🚀 MiniPython Compiler (`minipycc`)
+# MiniPython Compiler (`minipycc`)
 
-> **A production-grade, transparent, and explainable compiler for a Python subset.**
+`minipycc` is an educational compiler for a statically compilable Python subset.
+It lexes and parses MiniPython source, performs semantic checks, lowers the AST
+to a small custom IR, optionally runs optimization and analysis passes, emits
+LLVM IR, links against a C runtime, and can run the generated native executable.
 
-`minipycc` is not just a compiler; it is an educational and engineering platform designed to demonstrate the full lifecycle of a modern compiler. It translates **MiniPython** code into high-performance **LLVM IR** and native machine code, while providing deep insights into the compilation process through rich visualizations and static analysis reports.
+The compiler is intentionally transparent: each phase can emit artifacts such as
+tokens, AST graphs, IR dumps, CFG graphs, optimization reports, LLVM IR, and run
+output.
 
----
+## What It Supports
 
-## ✨ Key Features
+### Core Language
 
-### 🛠 Production Pipeline
-*   **Lexer**: Indentation-aware tokenizer handling Python's significant whitespace.
-*   **Parser**: Recursive descent parser building a clean Abstract Syntax Tree (AST).
-*   **IR**: Custom Typed Intermediate Representation (Quadruples) before LLVM.
-*   **Optimizer**: Multiple passes including Constant Folding and Dead Code Elimination.
-*   **Backend**: Generates LLVM IR (`.ll`) optimized by Clang for native execution.
+- Python-style significant indentation using spaces.
+- Top-level statements, compiled into a synthetic `main` function.
+- Function definitions with positional arguments.
+- Recursive and non-recursive function calls.
+- Assignment with first-assignment variable definition.
+- `return`.
+- `if` / `else`.
+- `while`.
+- `for i in range(...)` with:
+  - `range(stop)`
+  - `range(start, stop)`
+  - `range(start, stop, step)`
+- `break`, `continue`, and `pass`.
 
-### 🔍 Deep Analysis & Visualization
-*   **Explainable Artifacts**: Every stage of compilation outputs human-readable files.
-*   **Visual Graphs**:
-    *   **AST**: See the structure of your code.
-    *   **CFG**: View basic blocks and control flow (Pre & Post optimization).
-    *   **Dominator Tree**: Analyze code hierarchy and loops.
-*   **Metrics**: Automated reporting on Cyclomatic Complexity and instruction counts.
+### Types and Values
 
-### ⚡️ MiniPython v1 Language
-A strict, statically-compilable subset of Python:
-*   **Types**: 64-bit Integers (`int64`) only.
-*   **Control Flow**: `if`, `else`, `while`, function calls, recursion.
-*   **Math**: `+`, `-`, `*`, `/`, `( )`.
-*   **Logic**: `==`, `!=`, `<`, `<=`, `>`, `>=`.
-*   **Built-ins**: `print(value)`.
+- 64-bit integers.
+- Booleans: `True`, `False`.
+- Floats using LLVM `double`.
+- Strings for literals, printing, and equality/inequality checks.
+- Integer lists:
+  - list literals: `[1, 2, 3]`
+  - indexing: `xs[0]`
+  - indexed assignment: `xs[0] = 10`
+  - append: `xs.append(4)`
+  - length: `len(xs)`
+  - runtime bounds checking.
 
----
+### Operators
 
-## 🚀 Quick Start
+- Arithmetic: `+`, `-`, `*`, `/`.
+- Unary: `+x`, `-x`, `not x`.
+- Comparisons: `==`, `!=`, `<`, `<=`, `>`, `>=`.
+- Boolean/logical: `and`, `or`, `not`.
+- Parenthesized expressions.
 
-### Prerequisites
-*   **Python 3.9+**
-*   **Clang / LLVM**: `brew install llvm` (Mac) or `apt install clang llvm` (Linux)
-*   **Graphviz**: `brew install graphviz` (Mac) or `apt install graphviz` (Linux)
+### Builtins
 
-### 1. Installation
-Clone the repo and make the compiler executable:
+- `print(value)` supports integers, booleans, floats, and strings.
+- `len(xs)` supports lists.
+- `range(...)` is supported in `for` loops.
+
+### Diagnostics and Checks
+
+- Undefined variable checks.
+- Undefined function checks.
+- Function arity checks.
+- Assignment type compatibility checks.
+- Invalid `break` / `continue` outside loops.
+- List index type checks.
+- Basic function return compatibility checks.
+- Structured failure output in `result.json`.
+
+## Current Limitations
+
+This is still a compact teaching compiler, not full Python.
+
+- Tabs are not supported for indentation.
+- Function parameters are currently treated as integers.
+- User-defined functions currently return int-compatible values.
+- Lists currently store integers only.
+- Strings support printing and equality, but not concatenation.
+- Negative-step `range(...)` loops are not yet implemented correctly.
+- No dictionaries, classes, imports/modules, exceptions, lambdas, decorators, or
+  comprehensions.
+- No keyword arguments, default arguments, type annotations, or nested function
+  scopes.
+- The LLVM target triple is currently hard-coded for macOS in the backend.
+
+## Requirements
+
+Local development requires:
+
+- Python 3.9+
+- Clang / LLVM
+- Graphviz, only if you want PNG graph rendering
+- `make`, optional
+
+macOS:
+
+```bash
+brew install llvm graphviz
+```
+
+Debian/Ubuntu:
+
+```bash
+sudo apt update
+sudo apt install clang llvm graphviz build-essential make
+```
+
+## Quick Start
+
+Make the compiler executable:
+
 ```bash
 chmod +x minipycc
 ```
 
-### 2. Compile & Run
-We have provided test cases in `testcases/valid/`. Let's compile a factorial program:
+Compile and run a sample:
 
 ```bash
-./minipycc compile testcases/valid/fact.py \
-  --out build/fact \
+./minipycc compile testcases/valid/v2_v3.py \
+  --out build/v2_v3 \
   --emit all \
   --run
 ```
 
-**Output:**
+Expected output:
+
 ```text
 --- execution output ---
-3628800
+True
+5.5
+MiniPython
+True
+7
+14
+4
 ------------------------
-Build successful. Artifacts in build/fact
+Build successful. Artifacts in build/v2_v3
 ```
 
-### 3. Inspect the "Black Box"
-Go to `build/fact/` to see what the compiler did:
-*   Open `ast.png` to see how the code was parsed.
-*   Open `cfg.png` to see the flow of the program.
-*   Open `out.ll` to see the generated LLVM assembly.
-*   Read `complexity_report.json` to see code metrics.
+Compile a smaller arithmetic sample:
 
----
+```bash
+./minipycc compile testcases/valid/fact.py \
+  --out build/fact \
+  --emit llvm,exe \
+  --run
+```
 
-## 📖 CLI Reference
+Expected program output:
 
-The CLI is designed to be intuitive.
+```text
+-28183
+```
+
+## CLI Reference
 
 ```bash
 ./minipycc compile <SOURCE_FILE> --out <OUTPUT_DIR> [FLAGS]
@@ -83,93 +159,169 @@ The CLI is designed to be intuitive.
 
 | Flag | Description |
 | :--- | :--- |
-| **`--out <dir>`** | **Required**. The folder where all build artifacts are saved. |
-| **`--emit <list>`** | What to generate. Use `all` for everything, or comma-separated: <br>`tokens, ast, ir, cfg, opt, analysis, llvm, exe, png` |
-| **`--run`** | Immediately execute the compiled binary after successful build. |
-| **`--no-opt`** | Disable the optimization pass (useful for debugging raw IR). |
-| **`--analysis`** | Trigger the advanced static analysis engine (DomTree, Metrics). |
+| `--out <dir>` | Required output directory. The directory is deleted and recreated for each compile. |
+| `--emit <list>` | Comma-separated artifacts to emit. Use `all` for the full set. |
+| `--run` | Execute the generated native binary after a successful build. |
+| `--no-opt` | Skip the optimizer. |
+| `--metrics` | Accepted by the CLI for metrics workflows. |
+| `--analysis` | Run static analysis and emit complexity/dominator information. |
 
----
+Supported `--emit` values:
 
-## 🏛 Architecture
-
- The project follows a strict separation of concerns, mimicking industrial compiler architecture:
-
-```
-src/
-├── core/
-│   ├── lexer/       # Source -> Tokens (Handles Indentation)
-│   ├── parser/      # Tokens -> AST
-│   ├── semantic/    # Symbol Table & Type Checking
-│   ├── ir/          # AST -> Linear IR (Quadruples)
-│   ├── analysis/    # Static Analysis (Dominators, Loops)
-│   ├── opt/         # Optimization Passes (ConstFold, DCE)
-│   └── codegen/     # IR -> LLVM IR
-├── cli/             # Command Line Interface Driver
-└── runtime/         # C Runtime for built-ins (print)
+```text
+tokens, ast, ir, cfg, opt, analysis, llvm, exe, png, all
 ```
 
-### The Compilation Flow
-1.  **Lexing**: `fact.py` is read; `INDENT`/`DEDENT` tokens are injected.
-2.  **Parsing**: Tokens are consumed to build a tree of `Stmt` and `Expr` nodes.
-3.  **Semantics**: Variable existence and scopes are verified.
-4.  **Lowering**: AST is flattened into Basic Blocks of instructions (`ADD`, `JMP`, `CALL`).
-5.  **Analysis**: The Control Flow Graph is analyzed for complexity and loops.
-6.  **Optimization**: The IR is refined (constant math solved, dead code removed).
-7.  **Codegen**: Clean IR is translated to LLVM IR macros.
-8.  **Linking**: `clang` compiles the LLVM IR + `runtime.c` into a native executable.
+Examples:
 
----
+```bash
+# Emit only LLVM IR.
+./minipycc compile testcases/valid/fib.py --out build/fib --emit llvm
 
-## 🐳 Docker Support
+# Emit LLVM and executable, then run it.
+./minipycc compile testcases/valid/gcd.py --out build/gcd --emit llvm,exe --run
 
-Keep your host machine clean by running everything in Docker.
+# Emit every artifact, including DOT/PNG visualizations when Graphviz is present.
+./minipycc compile testcases/valid/v2_v3.py --out build/v2_v3 --emit all --run
 
-**1. Build the Builder Image**
+# Compile without optimization.
+./minipycc compile testcases/valid/v2_v3.py --out build/v2_v3_noopt --emit llvm,exe --run --no-opt
+```
+
+## Generated Artifacts
+
+Depending on `--emit`, the output directory can contain:
+
+| Artifact | Description |
+| :--- | :--- |
+| `tokens.txt` | Lexer token stream. |
+| `ast.dot` / `ast.png` | AST visualization. |
+| `ir.txt` | Custom IR before optimization. |
+| `cfg.dot` / `cfg.png` | Control-flow graph before optimization. |
+| `complexity_report.json` | Static analysis metrics. |
+| `domtree_<function>.dot` / `.png` | Dominator tree visualization. |
+| `optimization_report.json` | Optimizer summary. |
+| `ir_optimized.txt` | Custom IR after optimization. |
+| `cfg_optimized.dot` / `.png` | CFG after optimization. |
+| `out.ll` | Generated LLVM IR. |
+| `a.out` | Native executable. |
+| `run_output.txt` | Captured stdout from `--run`. |
+| `result.json` | Build manifest with status, diagnostics, timings, and artifacts. |
+
+## Docker Usage
+
+Build the Docker image:
+
 ```bash
 docker build -t minipycc .
 ```
 
-**2. Compile with Volume Mount**
-This runs the compiler *inside* the container but writes the output *outside* to your machine.
+Compile and run from inside the container while writing artifacts back to your
+host checkout:
+
 ```bash
 docker run --rm -v "$PWD:/work" minipycc \
-  compile testcases/valid/fact.py \
-  --out build/docker_fact \
+  compile testcases/valid/v2_v3.py \
+  --out build/docker_v2_v3 \
   --emit all \
   --run
 ```
 
----
+The image uses `/app/minipycc` as its entrypoint and `/work` as the working
+directory. Mounting the repository at `/work` lets the compiler read your local
+testcases and write build artifacts into your local `build/` directory.
 
-## 📈 Example Analysis Output
+Run a compile-only Docker build:
 
-When running with `--analysis` or `--emit all`, the compiler generates detailed reports.
-
-**`complexity_report.json`**:
-```json
-{
-  "functions": {
-    "main": {
-      "instruction_count": 15,
-      "block_count": 3,
-      "cyclomatic_complexity": 2,
-      "functions_called": ["print"]
-    }
-  }
-}
+```bash
+docker run --rm -v "$PWD:/work" minipycc \
+  compile testcases/valid/fib.py \
+  --out build/docker_fib \
+  --emit llvm,exe
 ```
 
-**`optimization_report.json`**:
-```json
-{
-  "initial_instruction_count": 20,
-  "final_instruction_count": 15,
-  "instructions_removed": 5,
-  "constants_folded": 2
-}
+## Tests
+
+Run the test harness:
+
+```bash
+python3 test_runner.py
 ```
 
----
+or:
 
-*Built for engineers who want to understand compilers, not just use them.*
+```bash
+make test
+```
+
+The harness compiles selected valid programs, runs them, checks stdout, and
+verifies selected invalid programs fail with the expected diagnostics.
+
+## Architecture
+
+```text
+src/
+├── cli/
+│   └── driver.py          # CLI and pipeline orchestration
+├── core/
+│   ├── lexer.py           # Source -> tokens
+│   ├── parser.py          # Tokens -> AST
+│   ├── ast.py             # AST nodes and DOT visualization
+│   ├── sema.py            # Symbol table and semantic checks
+│   ├── ir.py              # Custom IR and AST lowering
+│   ├── cfg.py             # CFG DOT generation
+│   ├── analysis/          # Complexity and dominator analysis
+│   ├── opt/               # Optimization passes
+│   ├── codegen_llvm.py    # Custom IR -> LLVM IR
+│   └── util.py            # Diagnostics, source manager, manifest, timers
+├── runtime/
+│   └── runtime.c          # C runtime for print, strings, and lists
+└── minipycc               # Executable compiler entrypoint
+```
+
+Compilation flow:
+
+1. Load source and tokenize indentation-aware MiniPython.
+2. Parse tokens into AST.
+3. Run semantic analysis and annotate expression types.
+4. Lower AST into a typed custom IR.
+5. Emit IR/CFG/analysis artifacts when requested.
+6. Optimize IR unless `--no-opt` is set.
+7. Generate LLVM IR.
+8. Link LLVM IR with `runtime/runtime.c` using `clang`.
+9. Optionally run the generated executable and capture stdout.
+
+## Example MiniPython Program
+
+```python
+a = True
+b = False
+print(a and not b)
+
+x = 3.5
+y = 2
+print(x + y)
+
+name = "MiniPython"
+print(name)
+print(name == "MiniPython")
+
+total = 0
+for i in range(1, 5):
+    if i == 3:
+        continue
+    total = total + i
+print(total)
+
+xs = [1, 2, 3]
+xs.append(4)
+xs[0] = 10
+print(xs[0] + xs[3])
+print(len(xs))
+
+while True:
+    pass
+    break
+```
+
+This program is checked in as `testcases/valid/v2_v3.py`.

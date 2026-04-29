@@ -1,0 +1,21 @@
+{
+  "status": "success",
+  "diagnostics": [],
+  "artifacts": {
+    "opt_report": "build/fact_v2check/optimization_report.json",
+    "llvm": "build/fact_v2check/out.ll",
+    "exe": "build/fact_v2check/a.out",
+    "run_output": "build/fact_v2check/run_output.txt"
+  },
+  "timings": {
+    "lex": 0.07,
+    "parse": 0.41,
+    "sema": 0.03,
+    "ir_gen": 0.05,
+    "opt": 0.02,
+    "llvm": 0.2,
+    "clang": 522.26,
+    "run": 490.8
+  },
+  "timestamp": 1777438895.428132
+}

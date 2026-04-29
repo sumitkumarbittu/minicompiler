@@ -1,0 +1,27 @@
+{
+  "status": "success",
+  "diagnostics": [],
+  "artifacts": {
+    "tokens": "build/docker_v2_v3/tokens.txt",
+    "ast_dot": "build/docker_v2_v3/ast.dot",
+    "ir": "build/docker_v2_v3/ir.txt",
+    "cfg_dot": "build/docker_v2_v3/cfg.dot",
+    "complexity_report": "build/docker_v2_v3/complexity_report.json",
+    "opt_report": "build/docker_v2_v3/optimization_report.json",
+    "ir_opt": "build/docker_v2_v3/ir_optimized.txt",
+    "llvm": "build/docker_v2_v3/out.ll",
+    "exe": "build/docker_v2_v3/a.out",
+    "run_output": "build/docker_v2_v3/run_output.txt"
+  },
+  "timings": {
+    "lex": 0.32,
+    "parse": 0.36,
+    "sema": 0.29,
+    "ir_gen": 0.31,
+    "opt": 0.19,
+    "llvm": 0.3,
+    "clang": 390.77,
+    "run": 1.85
+  },
+  "timestamp": 1777475131.4551616
+}

@@ -21,11 +21,20 @@ class OpCode(Enum):
     RET = auto()     # ret val
     LABEL = auto()   # label:
     PARAM = auto()   # param name (pseudo)
+    FADD = auto()
+    FSUB = auto()
+    FMUL = auto()
+    FDIV = auto()
+    BOOL_NOT = auto()
+    LIST_NEW = auto()
+    LIST_GET = auto()
+    LIST_SET = auto()
 
 @dataclass
 class Operand:
     kind: str # 'var', 'lit', 'label'
     value: Any
+    type: str = "int"
 
     def __str__(self):
         if self.kind == 'lit': return f"#{self.value}"
@@ -38,6 +47,7 @@ class Instr:
     src1: Optional[Operand] = None
     src2: Optional[Operand] = None
     args: List[Operand] = field(default_factory=list) # for call
+    type: str = "int"
 
     def __str__(self):
         s = f"{self.opcode.name:<8}"
@@ -100,8 +110,8 @@ class IRBuilder:
     def sub(self, dest, s1, s2): self.emit(Instr(OpCode.SUB, dest, s1, s2))
     def mul(self, dest, s1, s2): self.emit(Instr(OpCode.MUL, dest, s1, s2))
     def div(self, dest, s1, s2): self.emit(Instr(OpCode.DIV, dest, s1, s2))
-    def const(self, dest, val): self.emit(Instr(OpCode.CONST, dest, Operand('lit', val)))
-    def copy(self, dest, src): self.emit(Instr(OpCode.COPY, dest, src))
+    def const(self, dest, val, typ="int"): self.emit(Instr(OpCode.CONST, dest, Operand('lit', val, typ), type=typ))
+    def copy(self, dest, src, typ="int"): self.emit(Instr(OpCode.COPY, dest, src, type=typ))
     def jmp(self, label): self.emit(Instr(OpCode.JMP, src1=Operand('label', label)))
     def br(self, cond, t_lbl, f_lbl): 
         self.emit(Instr(OpCode.BR, src1=cond, args=[Operand('label', t_lbl), Operand('label', f_lbl)]))
@@ -115,6 +125,7 @@ from .ast import *
 class IRGen:
     def __init__(self, builder: IRBuilder):
         self.builder = builder
+        self.loop_stack = []
 
     def gen_module(self, mod: Module):
         for f in mod.functions:
@@ -130,12 +141,20 @@ class IRGen:
 
     def _gen_block(self, stmts: List[Stmt]):
         for stmt in stmts:
+            if self._is_terminated(self.builder.current_block):
+                break
             self.gen_stmt(stmt)
 
     def gen_stmt(self, stmt: Stmt):
         if isinstance(stmt, AssignStmt):
             val = self.gen_expr(stmt.value)
-            self.builder.copy(stmt.name, val)
+            self.builder.copy(stmt.name, val, self._type_of(stmt.value))
+
+        elif isinstance(stmt, IndexAssignStmt):
+            collection = self.gen_expr(stmt.collection)
+            index = self.gen_expr(stmt.index)
+            value = self.gen_expr(stmt.value)
+            self.builder.emit(Instr(OpCode.LIST_SET, src1=collection, src2=index, args=[value], type="void"))
             
         elif isinstance(stmt, ReturnStmt):
             val = self.gen_expr(stmt.value)
@@ -189,12 +208,66 @@ class IRGen:
             # Body
             bb_body = self.builder.new_block(body_lbl)
             self.builder.set_block(bb_body)
+            self.loop_stack.append((exit_lbl, cond_lbl))
             self._gen_block(stmt.body)
-            self.builder.jmp(cond_lbl)
+            self.loop_stack.pop()
+            if not self._is_terminated(self.builder.current_block):
+                self.builder.jmp(cond_lbl)
             
             # Exit
             bb_exit = self.builder.new_block(exit_lbl)
             self.builder.set_block(bb_exit)
+
+        elif isinstance(stmt, ForStmt):
+            init_val = self.gen_expr(stmt.start)
+            self.builder.copy(stmt.var, init_val, "int")
+            stop = self.gen_expr(stmt.stop)
+            stop_name = self.builder.new_temp()
+            self.builder.copy(stop_name, stop, "int")
+            step = self.gen_expr(stmt.step)
+            step_name = self.builder.new_temp()
+            self.builder.copy(step_name, step, "int")
+
+            cond_lbl = self.builder.new_label("for_cond")
+            body_lbl = self.builder.new_label("for_body")
+            incr_lbl = self.builder.new_label("for_incr")
+            exit_lbl = self.builder.new_label("for_exit")
+            self.builder.jmp(cond_lbl)
+
+            bb_cond = self.builder.new_block(cond_lbl)
+            self.builder.set_block(bb_cond)
+            cond_tmp = self.builder.new_temp()
+            self.builder.emit(Instr(OpCode.ICMP_LT, cond_tmp, Operand('var', stmt.var, "int"), Operand('var', stop_name, "int"), type="bool"))
+            self.builder.br(Operand('var', cond_tmp, "bool"), body_lbl, exit_lbl)
+
+            bb_body = self.builder.new_block(body_lbl)
+            self.builder.set_block(bb_body)
+            self.loop_stack.append((exit_lbl, incr_lbl))
+            self._gen_block(stmt.body)
+            self.loop_stack.pop()
+            if not self._is_terminated(self.builder.current_block):
+                self.builder.jmp(incr_lbl)
+
+            bb_incr = self.builder.new_block(incr_lbl)
+            self.builder.set_block(bb_incr)
+            next_tmp = self.builder.new_temp()
+            self.builder.emit(Instr(OpCode.ADD, next_tmp, Operand('var', stmt.var, "int"), Operand('var', step_name, "int"), type="int"))
+            self.builder.copy(stmt.var, Operand('var', next_tmp, "int"), "int")
+            self.builder.jmp(cond_lbl)
+
+            bb_exit = self.builder.new_block(exit_lbl)
+            self.builder.set_block(bb_exit)
+
+        elif isinstance(stmt, BreakStmt):
+            if self.loop_stack:
+                self.builder.jmp(self.loop_stack[-1][0])
+
+        elif isinstance(stmt, ContinueStmt):
+            if self.loop_stack:
+                self.builder.jmp(self.loop_stack[-1][1])
+
+        elif isinstance(stmt, PassStmt):
+            pass
 
     def _is_terminated(self, bb):
         if not bb.instrs: return False
@@ -203,31 +276,81 @@ class IRGen:
     def gen_expr(self, expr: Expr) -> Operand:
         if isinstance(expr, NumLit):
             t = self.builder.new_temp()
-            self.builder.const(t, expr.value)
-            return Operand('var', t)
+            self.builder.const(t, expr.value, "int")
+            return Operand('var', t, "int")
+
+        elif isinstance(expr, BoolLit):
+            t = self.builder.new_temp()
+            self.builder.const(t, 1 if expr.value else 0, "bool")
+            return Operand('var', t, "bool")
+
+        elif isinstance(expr, FloatLit):
+            t = self.builder.new_temp()
+            self.builder.const(t, expr.value, "float")
+            return Operand('var', t, "float")
+
+        elif isinstance(expr, StringLit):
+            t = self.builder.new_temp()
+            self.builder.const(t, expr.value, "str")
+            return Operand('var', t, "str")
             
         elif isinstance(expr, VarExpr):
-            return Operand('var', expr.name)
+            return Operand('var', expr.name, self._type_of(expr))
             
         elif isinstance(expr, CallExpr):
             args = [self.gen_expr(a) for a in expr.args]
             dest = self.builder.new_temp()
-            self.builder.call(dest, expr.callee, args)
-            return Operand('var', dest)
+            self.builder.emit(Instr(OpCode.CALL, dest, Operand('lit', expr.callee), args=args, type=self._type_of(expr)))
+            return Operand('var', dest, self._type_of(expr))
+
+        elif isinstance(expr, ListLit):
+            args = [self.gen_expr(e) for e in expr.elements]
+            dest = self.builder.new_temp()
+            self.builder.emit(Instr(OpCode.LIST_NEW, dest, args=args, type="list"))
+            return Operand('var', dest, "list")
+
+        elif isinstance(expr, IndexExpr):
+            collection = self.gen_expr(expr.collection)
+            index = self.gen_expr(expr.index)
+            dest = self.builder.new_temp()
+            self.builder.emit(Instr(OpCode.LIST_GET, dest, collection, index, type="int"))
+            return Operand('var', dest, "int")
+
+        elif isinstance(expr, UnaryOp):
+            operand = self.gen_expr(expr.operand)
+            dest = self.builder.new_temp()
+            typ = self._type_of(expr)
+            if expr.op == "not":
+                self.builder.emit(Instr(OpCode.BOOL_NOT, dest, operand, type="bool"))
+            elif expr.op == "-":
+                zero = self.builder.new_temp()
+                self.builder.const(zero, 0.0 if typ == "float" else 0, typ)
+                opcode = OpCode.FSUB if typ == "float" else OpCode.SUB
+                self.builder.emit(Instr(opcode, dest, Operand('var', zero, typ), operand, type=typ))
+            else:
+                return operand
+            return Operand('var', dest, typ)
             
         elif isinstance(expr, BinOp):
             l = self.gen_expr(expr.left)
             r = self.gen_expr(expr.right)
             dest = self.builder.new_temp()
+            typ = self._type_of(expr)
             
             op_map = {
                 "+": OpCode.ADD, "-": OpCode.SUB, 
                 "*": OpCode.MUL, "/": OpCode.DIV,
                 "==": OpCode.ICMP_EQ, "!=": OpCode.ICMP_NE,
                 "<": OpCode.ICMP_LT, "<=": OpCode.ICMP_LTE,
-                ">": OpCode.ICMP_GT, ">=": OpCode.ICMP_GTE
+                ">": OpCode.ICMP_GT, ">=": OpCode.ICMP_GTE,
+                "and": OpCode.MUL, "or": OpCode.ADD
             }
-            self.builder.emit(Instr(op_map[expr.op], dest, l, r))
-            return Operand('var', dest)
+            if typ == "float" and expr.op in ["+", "-", "*", "/"]:
+                op_map = {"+": OpCode.FADD, "-": OpCode.FSUB, "*": OpCode.FMUL, "/": OpCode.FDIV}
+            self.builder.emit(Instr(op_map[expr.op], dest, l, r, type=typ))
+            return Operand('var', dest, typ)
             
-        return Operand('lit', 0)
+        return Operand('lit', 0, "int")
+
+    def _type_of(self, node):
+        return getattr(node, "inferred_type", "int")

@@ -1,0 +1,22 @@
+{
+  "functions": {
+    "main": {
+      "name": "main",
+      "instruction_count": 65,
+      "block_count": 10,
+      "cyclomatic_complexity": 4,
+      "functions_called": [
+        "print",
+        "print",
+        "print",
+        "print",
+        "print",
+        "list_append",
+        "print",
+        "len",
+        "print"
+      ]
+    }
+  },
+  "total_instructions": 65
+}

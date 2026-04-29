@@ -95,7 +95,7 @@ def run_compile(args):
 
         # --- 3. Semantics ---
         t_sema = Timer("sema")
-        sema = SemanticAnalyzer(diag)
+        sema = SemanticAnalyzer(diag, full_path)
         sema.check(ast_mod)
         t_sema.stop()
         manifest.add_timing("sema", t_sema.duration_ms)

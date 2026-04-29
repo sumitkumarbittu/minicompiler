@@ -1,0 +1,24 @@
+digraph CFG {
+  node [shape=box, fontname="Courier"];
+  subgraph cluster_main {
+    label = "Func main";
+    main_start [label=<<b>start:</b><br align='left'/>CONST    t1     = #1 <br align='left'/>COPY     a      = t1 <br align='left'/>CONST    t2     = #0 <br align='left'/>COPY     b      = t2 <br align='left'/>BOOL_NOT t3     = b <br align='left'/>MUL      t4     = a t3 <br align='left'/>CALL     t5     = #print args:(t4)<br align='left'/>CONST    t6     = #3.5 <br align='left'/>COPY     x      = t6 <br align='left'/>CONST    t7     = #2 <br align='left'/>COPY     y      = t7 <br align='left'/>FADD     t8     = x y <br align='left'/>CALL     t9     = #print args:(t8)<br align='left'/>CONST    t10    = #MiniPython <br align='left'/>COPY     name   = t10 <br align='left'/>CALL     t11    = #print args:(name)<br align='left'/>CONST    t12    = #MiniPython <br align='left'/>ICMP_EQ  t13    = name t12 <br align='left'/>CALL     t14    = #print args:(t13)<br align='left'/>CONST    t15    = #0 <br align='left'/>COPY     total  = t15 <br align='left'/>CONST    t16    = #1 <br align='left'/>COPY     i      = t16 <br align='left'/>CONST    t17    = #5 <br align='left'/>COPY     t18    = t17 <br align='left'/>CONST    t19    = #1 <br align='left'/>COPY     t20    = t19 <br align='left'/>JMP     for_cond_1 >];
+    main_for_cond_1 [label=<<b>for_cond_1:</b><br align='left'/>ICMP_LT  t21    = i t18 <br align='left'/>BR      t21 args:(for_body_2, for_exit_4)>];
+    main_for_body_2 [label=<<b>for_body_2:</b><br align='left'/>CONST    t22    = #3 <br align='left'/>ICMP_EQ  t23    = i t22 <br align='left'/>BR      t23 args:(for_incr_3, if_cont_7)>];
+    main_if_cont_7 [label=<<b>if_cont_7:</b><br align='left'/>ADD      t24    = total i <br align='left'/>COPY     total  = t24 <br align='left'/>JMP     for_incr_3 >];
+    main_for_incr_3 [label=<<b>for_incr_3:</b><br align='left'/>ADD      t25    = i t20 <br align='left'/>COPY     i      = t25 <br align='left'/>JMP     for_cond_1 >];
+    main_for_exit_4 [label=<<b>for_exit_4:</b><br align='left'/>CALL     t26    = #print args:(total)<br align='left'/>CONST    t27    = #1 <br align='left'/>CONST    t28    = #2 <br align='left'/>CONST    t29    = #3 <br align='left'/>LIST_NEW t30    = args:(t27, t28, t29)<br align='left'/>COPY     xs     = t30 <br align='left'/>CONST    t31    = #4 <br align='left'/>CALL     t32    = #list_append args:(xs, t31)<br align='left'/>CONST    t33    = #0 <br align='left'/>CONST    t34    = #10 <br align='left'/>LIST_SETxs t33 args:(t34)<br align='left'/>CONST    t35    = #0 <br align='left'/>LIST_GET t36    = xs t35 <br align='left'/>CONST    t37    = #3 <br align='left'/>LIST_GET t38    = xs t37 <br align='left'/>ADD      t39    = t36 t38 <br align='left'/>CALL     t40    = #print args:(t39)<br align='left'/>CALL     t41    = #len args:(xs)<br align='left'/>CALL     t42    = #print args:(t41)<br align='left'/>JMP     while_cond_8 >];
+    main_while_cond_8 [label=<<b>while_cond_8:</b><br align='left'/>CONST    t43    = #1 <br align='left'/>BR      t43 args:(while_exit_10, while_exit_10)>];
+    main_while_exit_10 [label=<<b>while_exit_10:</b><br align='left'/>CONST    t44    = #0 <br align='left'/>RET     t44 >];
+    main_start -> main_for_cond_1;
+    main_for_cond_1 -> main_for_body_2 [label="T"];
+    main_for_cond_1 -> main_for_exit_4 [label="F"];
+    main_for_body_2 -> main_for_incr_3 [label="T"];
+    main_for_body_2 -> main_if_cont_7 [label="F"];
+    main_if_cont_7 -> main_for_incr_3;
+    main_for_incr_3 -> main_for_cond_1;
+    main_for_exit_4 -> main_while_cond_8;
+    main_while_cond_8 -> main_while_exit_10 [label="T"];
+    main_while_cond_8 -> main_while_exit_10 [label="F"];
+  }
+}

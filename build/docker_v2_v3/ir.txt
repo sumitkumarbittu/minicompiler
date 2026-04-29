@@ -1,0 +1,76 @@
+Function main:
+  start:
+    CONST    t1     = #1 
+    COPY     a      = t1 
+    CONST    t2     = #0 
+    COPY     b      = t2 
+    BOOL_NOT t3     = b 
+    MUL      t4     = a t3 
+    CALL     t5     = #print args:(t4)
+    CONST    t6     = #3.5 
+    COPY     x      = t6 
+    CONST    t7     = #2 
+    COPY     y      = t7 
+    FADD     t8     = x y 
+    CALL     t9     = #print args:(t8)
+    CONST    t10    = #MiniPython 
+    COPY     name   = t10 
+    CALL     t11    = #print args:(name)
+    CONST    t12    = #MiniPython 
+    ICMP_EQ  t13    = name t12 
+    CALL     t14    = #print args:(t13)
+    CONST    t15    = #0 
+    COPY     total  = t15 
+    CONST    t16    = #1 
+    COPY     i      = t16 
+    CONST    t17    = #5 
+    COPY     t18    = t17 
+    CONST    t19    = #1 
+    COPY     t20    = t19 
+    JMP     for_cond_1 
+  for_cond_1:
+    ICMP_LT  t21    = i t18 
+    BR      t21 args:(for_body_2, for_exit_4)
+  for_body_2:
+    CONST    t22    = #3 
+    ICMP_EQ  t23    = i t22 
+    BR      t23 args:(then_5, if_cont_7)
+  then_5:
+    JMP     for_incr_3 
+  if_cont_7:
+    ADD      t24    = total i 
+    COPY     total  = t24 
+    JMP     for_incr_3 
+  for_incr_3:
+    ADD      t25    = i t20 
+    COPY     i      = t25 
+    JMP     for_cond_1 
+  for_exit_4:
+    CALL     t26    = #print args:(total)
+    CONST    t27    = #1 
+    CONST    t28    = #2 
+    CONST    t29    = #3 
+    LIST_NEW t30    = args:(t27, t28, t29)
+    COPY     xs     = t30 
+    CONST    t31    = #4 
+    CALL     t32    = #list_append args:(xs, t31)
+    CONST    t33    = #0 
+    CONST    t34    = #10 
+    LIST_SETxs t33 args:(t34)
+    CONST    t35    = #0 
+    LIST_GET t36    = xs t35 
+    CONST    t37    = #3 
+    LIST_GET t38    = xs t37 
+    ADD      t39    = t36 t38 
+    CALL     t40    = #print args:(t39)
+    CALL     t41    = #len args:(xs)
+    CALL     t42    = #print args:(t41)
+    JMP     while_cond_8 
+  while_cond_8:
+    CONST    t43    = #1 
+    BR      t43 args:(while_body_9, while_exit_10)
+  while_body_9:
+    JMP     while_exit_10 
+  while_exit_10:
+    CONST    t44    = #0 
+    RET     t44 

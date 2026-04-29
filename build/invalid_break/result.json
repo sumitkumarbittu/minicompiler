@@ -1,0 +1,20 @@
+{
+  "status": "fail",
+  "diagnostics": [
+    {
+      "severity": "error",
+      "file": "/Users/sumitkumar/Documents/GitHub/minicompiler/testcases/invalid/break_outside.py",
+      "line": 1,
+      "col": 1,
+      "message": "'break' used outside a loop",
+      "snippet": ""
+    }
+  ],
+  "artifacts": {},
+  "timings": {
+    "lex": 0.02,
+    "parse": 0.01,
+    "sema": 0.01
+  },
+  "timestamp": 1777438967.297386
+}
